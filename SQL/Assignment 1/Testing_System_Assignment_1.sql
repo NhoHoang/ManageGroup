@@ -65,3 +65,19 @@ content varchar(1500),
 questionid int,
 iscorrect varchar(50)
 );
+
+create table if not exists `exam`(
+examID int,
+`code` varchar(50),
+title varchar(50),
+categoryID int,
+duration time,
+creatorID int,
+createdate date
+);
+
+create table if not exists `examquestion`(
+examID int,
+questionID int
+);
+-- update
