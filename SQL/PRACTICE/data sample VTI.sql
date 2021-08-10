@@ -26,10 +26,6 @@ CREATE TABLE IF NOT EXISTS `Position`
     CONSTRAINT pk_1 PRIMARY KEY (PositionID)
 );
 
-alter table `position` change column `PositionName` `PositionName` varchar(50);
-
-
-
 DROP TABLE IF EXISTS `Account`;
 CREATE TABLE IF NOT EXISTS `Account`
 (
@@ -166,6 +162,19 @@ VALUES ('vti_account1@vtiacademy.com', 'vti1', 'Nguyen Van Tinh', 1, 1, '2019-12
        ('vti_account10@vtiacademy.com', 'account_vti10', 'Nguyen Ba Dao', 1, 5, '2019-10-01'),
        ('vti_account11@vtiacademy.com', 'account_vti11', 'Nguyen Van Binh', 1, 3, '2020-12-01');
 
+
+
+/* CHEN GIA TRỊ NULL VÀO EMAIL*/
+
+UPDATE `ACCOUNT` 
+SET  `EMAIL` = NULL 
+WHERE AccountID = '1';
+SELECT * FROM `ACCOUNT`;
+
+
+
+
+
 /* INSERT DATA bang Group */
 INSERT INTO `Group`(`GroupName`, `CreatorID`, CreateDate)
 VALUES ('Nhom 1', '3', '2021-04-03'),
@@ -178,6 +187,7 @@ VALUES ('Nhom 1', '3', '2021-04-03'),
        ('Nhom 8', '5', '2019-05-03'),
        ('Nhom 9', '3', '2019-01-03'),
        ('Nhom 10', '1', NOW());
+
 
 /* INSERT DATA bang GroupAccount */
 INSERT INTO `GroupAccount`(`GroupID`, `AccountID`, `JoinDate`)
@@ -284,3 +294,56 @@ VALUES (1, 1),
        (14, 4),
        (15, 5),
        (16, 5);
+       
+       
+       
+       -- ================================ Assignment 4 --=================================
+-- =================================	-- =================================
+-- =================================-	- =================================
+-- =================================     -- =================================
+
+select * from `account`;
+select * from `department`;
+
+
+update `account`
+set departmentid = null
+where `accountid` = '3';
+
+SELECT A.`AccountID`, A.`EMAIL`, A.`FULLNAME` ,  D.`DEPARTMENTID`, D.`DEPARTMENTNAME`
+FROM `ACCOUNT` AS A 
+LEFT JOIN  `DEPARTMENT` AS D
+ON A.`DEPARTMENTID` = D.`DEPARTMENTID`;
+
+SELECT A.`AccountID`, A.`EMAIL`, A.`FULLNAME` ,  D.`DEPARTMENTID`, D.`DEPARTMENTNAME`
+FROM `ACCOUNT` AS A 
+INNER JOIN  `DEPARTMENT` AS D
+ON A.`DEPARTMENTID` = D.`DEPARTMENTID`;
+
+SELECT A.`AccountID`, A.`EMAIL`, A.`FULLNAME` ,  D.`DEPARTMENTID`, D.`DEPARTMENTNAME`
+FROM `ACCOUNT` AS A 
+RIGHT JOIN  `DEPARTMENT` AS D
+ON A.`DEPARTMENTID` = D.`DEPARTMENTID`;
+
+
+-- ==> Question 1:
+-- ========================
+-- ========================
+-- ========================
+SELECT A.`AccountID`, A.`EMAIL`, A.`FULLNAME` ,  D.`DEPARTMENTID`, D.`DEPARTMENTNAME`
+FROM `ACCOUNT` AS A 
+INNER JOIN  `DEPARTMENT` AS D
+ON A.`DEPARTMENTID` = D.`DEPARTMENTID`;
+-- ========================
+-- ========================
+-- ========================
+
+
+select * from `account`;
+
+
+
+
+-- ==> Question 1:
+-- ========================
+-- ========================

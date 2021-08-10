@@ -1,9 +1,9 @@
-/* Lenh xoa Database */
-DROP DATABASE IF EXISTS `Testing_System_1`;
+
+DROP DATABASE IF EXISTS `Testing_System_5`;
 /* Lenh tao Database */
-CREATE DATABASE IF NOT EXISTS `Testing_System_1`;
+CREATE DATABASE IF NOT EXISTS `Testing_System_5`;
 /* Lenh su dung Database */
-USE `Testing_System_1`;
+USE `Testing_System_5`;
 
 
 /*------------------- Create table ----------------------- */
@@ -26,10 +26,6 @@ CREATE TABLE IF NOT EXISTS `Position`
     CONSTRAINT pk_1 PRIMARY KEY (PositionID)
 );
 
-alter table `position` change column `PositionName` `PositionName` varchar(50);
-
-
-
 DROP TABLE IF EXISTS `Account`;
 CREATE TABLE IF NOT EXISTS `Account`
 (
@@ -38,10 +34,10 @@ CREATE TABLE IF NOT EXISTS `Account`
     `Username`     VARCHAR(50) NOT NULL,
     `Fullname`     VARCHAR(50),
     `DepartmentID` TINYINT UNSIGNED,
-    `PossitionID`  TINYINT UNSIGNED,
+    `PositionID`  TINYINT UNSIGNED,
     `CreateDate`   DATETIME ,
     CONSTRAINT fk_dp_id FOREIGN KEY (`DepartmentID`) REFERENCES `Department` (`DepartmentID`) ON DELETE SET NULL ON UPDATE CASCADE,
-    CONSTRAINT fk_ps_id FOREIGN KEY (`PossitionID`) REFERENCES `Position` (`PositionID`) ON DELETE SET NULL ON UPDATE CASCADE
+    CONSTRAINT fk_ps_id FOREIGN KEY (`PositionID`) REFERENCES `Position` (`PositionID`) ON DELETE SET NULL ON UPDATE CASCADE
 );
 
 DROP TABLE IF EXISTS `Group`;
@@ -153,7 +149,7 @@ ALTER TABLE `Account`
     DROP CONSTRAINT `fk_dp_id`,
     DROP CONSTRAINT `fk_ps_id`;
 /* INSERT DATA bang Account */
-INSERT INTO `Account`(`Email`, `Username`, `Fullname`, `DepartmentID`, `PossitionID`, `CreateDate`)
+INSERT INTO `Account`(`Email`, `Username`, `Fullname`, `DepartmentID`, `PositionID`, `CreateDate`)
 VALUES ('vti_account1@vtiacademy.com', 'vti1', 'Nguyen Van Tinh', 1, 1, '2019-12-01'),
        ('vti_account2@vtiacademy.com', 'vti2', 'Trinh Hoai Linh', 1, 2, '2020-12-01'),
        ('vti_account3@vtiacademy.com', 'vti3', 'Nguyen Van Test', 1, 1, '2020-07-01'),
@@ -267,6 +263,7 @@ ALTER TABLE `ExamQuestion`
     DROP CONSTRAINT `fk_eq1`,
     DROP CONSTRAINT `fk_eq2`;
 /* INSERT DATA bang Examquestion */
+
 INSERT INTO `ExamQuestion`
 VALUES (1, 1),
        (2, 1),
@@ -284,3 +281,155 @@ VALUES (1, 1),
        (14, 4),
        (15, 5),
        (16, 5);
+     ##
+     -- ASSIGNMENT 3
+     #
+     # #
+     #  # #
+     #    # #
+     #  # #
+     #
+   -- QUESTION 3  
+SELECT  D.DepartmentID, A.Fullname, D.DepartmentName, A.Email 
+FROM `ACCOUNT` AS A
+RIGHT JOIN DEPARTMENT AS D
+ON   A.DEPARTMENTID = D.DEPARTMENTID
+WHERE D.DepartmentName LIKE '%SALE%'
+ORDER BY D.DEPARTMENTID;
+
+     -- QUESTION 4  
+     
+SELECT A.AccountID, A.Fullname, D.DepartmentName, character_length(A.Fullname) AS BUOI
+FROM `ACCOUNT` AS A
+JOIN DEPARTMENT AS D
+ON   A.DEPARTMENTID = D.DEPARTMENTID
+WHERE character_length(A.Fullname) =  ( SELECT MAX(`T`.`L`) FROM (  SELECT A.AccountID, A.Fullname, D.DepartmentName, character_length(A.Fullname) AS `L`
+												FROM `ACCOUNT` AS A
+												JOIN DEPARTMENT AS D
+												ON   A.DEPARTMENTID = D.DEPARTMENTID) AS T  );
+
+ -- QUESTION 5
+SELECT A.AccountID, A.Fullname, D.DepartmentID ,D.DepartmentName, character_length(A.Fullname) AS BUOI
+FROM `ACCOUNT` AS A
+JOIN DEPARTMENT AS D
+ON   A.DEPARTMENTID = D.DEPARTMENTID
+WHERE character_length(A.Fullname) =  ( SELECT MAX(`T`.`L`) FROM (  SELECT A.AccountID, A.Fullname, D.DepartmentName, character_length(A.Fullname) AS `L`
+												FROM `ACCOUNT` AS A
+												JOIN DEPARTMENT AS D
+												ON   A.DEPARTMENTID = D.DEPARTMENTID) AS T  )
+AND D.DepartmenTID ='3';									
+                                                
+                                                
+                                                
+ -- QUESTION 7
+SELECT Q.QuestionID, Q.Content, COUNT(A.QuestionID) AS SL
+FROM `ANSWER` AS A
+JOIN `QUESTION` AS Q
+ON A.QUESTIONID = Q.QUESTIONID
+GROUP BY A.QuestionID
+HAVING COUNT(A.QuestionID) >'3';
+
+
+
+ -- QUESTION 8
+ SELECT * FROM testing_system_5.exam
+
+WHERE Duration >= '60'
+AND CreateDate < '2021-08-09';
+
+ -- QUESTION 9
+ 
+ SELECT * FROM testing_system_5.group
+
+order by CreateDate desc limit 2;
+
+ -- QUESTION 10
+ # SỐ NHÂN VIÊN THEO TỪNG PHÒNG
+ SELECT D.DepartmentID , D.DepartmentName, A.Fullname, COUNT(A.DepartmentID)
+ FROM DEPARTMENT AS D
+ LEFT JOIN `ACCOUNT`  AS A
+ ON
+ D.DEPARTMENTID = A.DEPARTMENTID
+ group by D.DEPARTMENTID;
+ 
+# SỐ NHÂN VIÊN CỦA PHÒNG CÓ ID=2
+
+SELECT D.DepartmentID , D.DepartmentName, A.Fullname, COUNT(A.DepartmentID) AS SL
+ FROM DEPARTMENT AS D
+ JOIN `ACCOUNT`  AS A
+ ON
+ D.DEPARTMENTID = A.DEPARTMENTID
+ WHERE A.DepartmentID ='2';
+
+
+
+ -- QUESTION 11
+	#
+     delete from `exam`
+where examid='1';
+	
+
+alter TABLE `EXAM`
+CHANGE CREATORID CREATOO INT;
+
+UPDATE `EXAM`
+SET CREATOO = '3'
+WHERE EXAMID = '2';
+    
+   -- QUESTION 14
+   
+   UPDATE `ACCOUNT`
+SET FULLNAME = 'SUATEN',
+	EMAIL = 'AAAAAAAAAAAAA'
+	WHERE ACCOUNTID ='5';
+    
+    
+    ### ASSIGMENT 4
+    
+    
+    
+-- QUESTION 1
+
+
+
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+     
+       
+       
