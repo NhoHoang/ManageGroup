@@ -1,8 +1,8 @@
 
 DROP DATABASE IF EXISTS `Testing_System_5`;
-/* Lenh tao Database */
+
 CREATE DATABASE IF NOT EXISTS `Testing_System_5`;
-/* Lenh su dung Database */
+
 USE `Testing_System_5`;
 
 
