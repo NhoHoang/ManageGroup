@@ -1,8 +1,8 @@
 
 DROP DATABASE IF EXISTS `Testing_System_5`;
-
+/* Lenh tao Database */
 CREATE DATABASE IF NOT EXISTS `Testing_System_5`;
-
+/* Lenh su dung Database */
 USE `Testing_System_5`;
 
 
@@ -36,8 +36,8 @@ CREATE TABLE IF NOT EXISTS `Account`
     `DepartmentID` TINYINT UNSIGNED,
     `PositionID`  TINYINT UNSIGNED,
     `CreateDate`   DATETIME ,
-    CONSTRAINT fk_dp_id FOREIGN KEY (`DepartmentID`) REFERENCES `Department` (`DepartmentID`) ON DELETE SET NULL ON UPDATE CASCADE,
-    CONSTRAINT fk_ps_id FOREIGN KEY (`PositionID`) REFERENCES `Position` (`PositionID`) ON DELETE SET NULL ON UPDATE CASCADE
+    CONSTRAINT fk_dp_id FOREIGN KEY (`DepartmentID`) REFERENCES `Department` (`DepartmentID`) ON UPDATE CASCADE ON DELETE SET NULL,
+    CONSTRAINT fk_ps_id FOREIGN KEY (`PositionID`) REFERENCES `Position` (`PositionID`) ON UPDATE CASCADE ON DELETE SET NULL
 );
 
 DROP TABLE IF EXISTS `Group`;
@@ -148,6 +148,14 @@ VALUES ('Dev1'),
 ALTER TABLE `Account`
     DROP CONSTRAINT `fk_dp_id`,
     DROP CONSTRAINT `fk_ps_id`;
+    -- Anh có drop cnstraint ở đây r nhỉalter
+    -- Chắc là nó không nhận nối Dep1 với PosNull đâu :v
+    -- Vì làm j có PosNull mà nối :))
+    -- thế tóm lại h làm j :v 
+    -- Kiểm tra count(*) e thường dùng với 1 row không phải FK :))
+    -- Lần đầu thử thế này mà cái join với FK lại chặn không cho đi hướng đó r :))
+-- ảo thật đấy :v 
+-- Do không tồn tại giá trị PostionID Null trong bảng Postion nên không nối đc là đúng r :)
 /* INSERT DATA bang Account */
 INSERT INTO `Account`(`Email`, `Username`, `Fullname`, `DepartmentID`, `PositionID`, `CreateDate`)
 VALUES ('vti_account1@vtiacademy.com', 'vti1', 'Nguyen Van Tinh', 1, 1, '2019-12-01'),
@@ -282,6 +290,11 @@ VALUES (1, 1),
        (15, 5),
        (16, 5);
      ##
+     
+     
+     
+     
+     
      -- ASSIGNMENT 3
      #
      # #
@@ -299,7 +312,7 @@ ORDER BY D.DEPARTMENTID;
 
      -- QUESTION 4  
      
-SELECT A.AccountID, A.Fullname, D.DepartmentName, character_length(A.Fullname) AS BUOI
+SELECT A.AccountID, A.Fullname, D.DepartmentName, character_length(A.Fullname) AS do_dai
 FROM `ACCOUNT` AS A
 JOIN DEPARTMENT AS D
 ON   A.DEPARTMENTID = D.DEPARTMENTID
@@ -391,45 +404,238 @@ SET FULLNAME = 'SUATEN',
 -- QUESTION 1
 
 
+SELECT *
+FROM `ACCOUNT` AS A
+JOIN DEPARTMENT AS D
+ON  D.DEPARTMENTID = A.DEPARTMENTID;
 
-     
-     
-     
-     
-     
-     
-     
-     
-     
-     
-     
-     
-     
-     
-     
-     
-     
-     
-     
-     
-     
-     
-     
-     
-     
-     
-     
-     
-     
-     
-     
-     
-     
-     
-     
-     
-     
-     
-     
-       
-       
+
+    
+-- QUESTION 2
+SELECT A.AccountID, A.Email, A.Fullname, A.DepartmentID, D.DepartmentName, A.CreateDate
+FROM `ACCOUNT` AS A
+JOIN DEPARTMENT AS D
+ON  D.DEPARTMENTID = A.DEPARTMENTID
+WHERE A.CreateDate > '2020-07-01'
+GROUP BY ACCOUNTID;
+
+-- QUESTION 3
+
+SELECT   A.Fullname, A.Email, A.DepartmentID, P.PositionName
+FROM `ACCOUNT` AS A
+JOIN POSITION AS P
+ON  P.POSITIONID = A.POSITIONID
+WHERE P.PositionName LIKE '%dev%';
+
+-- QUESTION 4
+SELECT  D.DepartmentID, D.DepartmentName, COUNT(A.DepartmentID) AS SL_NV
+FROM `ACCOUNT` AS A
+JOIN DEPARTMENT AS D
+ON  D.DEPARTMENTID = A.DEPARTMENTID
+GROUP BY A.DepartmentID
+HAVING sl_nv = ( SELECT MAX(T.SL_NV) FROM (SELECT  D.DepartmentID, D.DepartmentName, COUNT(A.DepartmentID) AS SL_NV
+													FROM `ACCOUNT` AS A
+													JOIN DEPARTMENT AS D
+													ON  D.DEPARTMENTID = A.DEPARTMENTID
+													GROUP BY A.DepartmentID) AS T         
+                                                    
+								);
+
+
+-- QUESTION 5
+SELECT Q.QuestionID ,Q.Content, COUNT(EQ.QuestionID) AS SL
+FROM EXAMQUESTION AS EQ
+JOIN QUESTION 	  AS Q
+ON   EQ.QuestionID = Q.QuestionID
+GROUP BY EQ.QuestionID
+HAVING 
+COUNT(EQ.QuestionID)  = (SELECT    MAX(T.SL)  FROM( SELECT Q.QuestionID ,Q.Content, COUNT(EQ.QuestionID) AS SL
+													FROM EXAMQUESTION AS EQ
+													JOIN QUESTION 	  AS Q
+													ON   EQ.QuestionID = Q.QuestionID
+													GROUP BY EQ.QuestionID) AS T  );
+
+
+-- QUESTION 7
+SELECT Q.QuestionID, Q.Content, COUNT(EQ.QuestionID) AS SL
+FROM EXAMQUESTION AS EQ
+RIGHT JOIN QUESTION 	  AS Q
+ON   EQ.QuestionID = Q.QuestionID
+GROUP BY EQ.QuestionID;
+
+-- QUESTION 9
+
+SELECT  G.GroupID, G.GroupName, COUNT(GA.GROUPID) AS SL
+FROM `GROUPACCOUNT` AS GA
+JOIN `ACCOUNT`  AS A
+ON GA.AccountID = A.AccountID
+JOIN `GROUP` AS G
+ON GA.GroupID = G.GroupID
+GROUP BY GA.GROUPID ;
+
+-- QUESTION 10
+
+SELECT P.PositionID, P.PositionName, COUNT(A.PositionID) AS S_LUONG
+FROM 		`POSITION` AS P
+LEFT JOIN   `ACCOUNT`  AS A
+ON 			A.positionID = P.positionID
+GROUP BY (A.PositionID)
+HAVING   S_LUONG = (       
+						SELECT MAX(T.SL)   FROM(SELECT P.PositionID, P.PositionName, COUNT(A.PositionID) AS SL
+												FROM 		`POSITION` AS P
+												LEFT JOIN   `ACCOUNT`  AS A
+												ON 			A.positionID = P.positionID
+												GROUP BY (A.PositionID))  AS T         
+
+			  );
+
+
+-- QUESTION 11
+
+SELECT D.DepartmentID, D.DepartmentName AS TENPHONG , A.PositionID, P.positionNAME AS VITRI, COUNT(A.positionID) AS SL_NGUOI
+FROM `DEPARTMENT` 	AS D
+LEFT JOIN `ACCOUNT` AS A
+ON 		  			   D.departmentID = A.departmentID
+LEFT JOIN `POSITION` AS P
+ON                     A.positionID   = P.positionID
+GROUP BY D.departmentID, A.positionID
+order by D.departmentID;
+
+
+
+-- QUESTION 12
+SELECT Q.QuestionID, Q.Content,  A.Content, CQ.CategoryName, TQ.TypeName, Q.CreatorID, AC.Username,AC.Fullname
+FROM 
+	 `question` 			AS Q
+JOIN `ANSWER`   			AS A
+ON 			     		Q.QuestionID = A.QuestionID
+
+JOIN `categoryquestion` 	AS CQ
+ON						Q.CategoryID = CQ.CategoryID
+
+JOIN `typequestion` 		AS TQ
+ON 						Q.TypeID = TQ.TypeID
+
+JOIN `account`			AS AC
+ON 						Q.CreatorID = AC.AccountID
+ORDER BY Q.QuestionID;
+
+
+
+-- QUESTION 13
+
+SELECT TQ.TypeID, TQ.TypeName, COUNT(Q.TypeID)
+FROM question AS Q
+JOIN typequestion AS TQ
+ON Q.TypeID = TQ.TypeID
+GROUP BY Q.TypeID;
+
+-- QUESTION 14
+
+SELECT G.GroupID, G.GroupName, GA.AccountID
+FROM `group` AS G
+LEFT JOIN groupaccount AS GA
+ON G.GroupID = GA.GroupID
+WHERE GA.AccountID IS NULL;
+
+
+
+-- QUESTION 15
+
+SELECT 
+    *
+FROM
+    testing_system_5.group AS G
+WHERE
+    G.GroupID NOT IN (SELECT 
+            GroupID
+        FROM
+            groupaccount);
+
+
+-- QUESTION 16
+select *
+from question as q
+left join answer as a
+on q.QuestionID =a.QuestionID;
+
+SELECT q.QuestionID FROM answer a
+RIGHT JOIN question q on a.QuestionID = q.QuestionID
+WHERE a.QuestionID IS NULL;
+
+
+
+-- QUESTION 17
+select GA.AccountID, G.GroupName
+FROM `GROUP` AS G
+JOIN groupaccount AS GA
+ON G.GroupID = GA.GroupID
+WHERE GA.GroupID = '1'
+
+
+
+UNION
+
+
+select GA.AccountID, G.GroupName
+FROM `GROUP` AS G
+JOIN groupaccount AS GA
+ON G.GroupID = GA.GroupID
+WHERE GA.GroupID = '5';
+
+
+-- QUESTION 18
+
+SELECT GA.GroupID, COUNT(GA.GroupID) AS SLNV
+FROM groupaccount AS GA
+JOIN `account` AS A
+ON GA.AccountID = A.AccountID
+GROUP BY GA.GroupID
+HAVING SLNV > '3';
+
+
+SELECT  G.GroupID, G.GroupName, COUNT(GA.ACCOUNTID) AS SL
+FROM `GROUPACCOUNT` AS GA
+JOIN `ACCOUNT`  AS A
+ON GA.AccountID = A.AccountID
+JOIN `GROUP` AS G
+ON GA.GroupID = G.GroupID
+GROUP BY GA.GROUPID ;
+
+
+
+
+SELECT * FROM testing_system_5.account;
+
+DROP VIEW IF EXISTS  `V_ACCOUNT_SALE`;
+
+CREATE VIEW `V_ACCOUNT_SALE` AS
+SELECT A.*, DEPARTMENTNAME, POSITIONNAME
+FROM `ACCOUNT` AS A
+JOIN DEPARTMENT AS D
+USING (DEPARTMENTID)
+JOIN POSITION AS P
+USING (POSITIONID)
+WHERE DEPARTMENTNAME LIKE'%SALE%';
+
+
+
+
+
+# buoi 5
+WITH CTE_ACCOUNT AS 
+(
+SELECT A.*, DEPARTMENTNAME, POSITIONNAME
+FROM `ACCOUNT` AS A
+JOIN DEPARTMENT AS D
+ON  A.DEPARTMENTID=D.departmentID
+JOIN POSITION AS P
+ON A.POSITIONID=P.positionID
+) 
+SELECT * FROM CTE_ACCOUNT;
+SELECT departmentNAME FROM CTE_ACCOUNT;
+
+
+
+
+
