@@ -145,9 +145,7 @@ VALUES ('Dev1'),
        ('Scrum Master');
 
 /* lenh sua bang xoa khoa ngoai foreign key*/
-ALTER TABLE `Account`
-    DROP CONSTRAINT `fk_dp_id`,
-    DROP CONSTRAINT `fk_ps_id`;
+ALTER TABLE `Account` DROP CONSTRAINT `fk_dp_id`, DROP CONSTRAINT `fk_ps_id`;
     -- Anh có drop cnstraint ở đây r nhỉalter
     -- Chắc là nó không nhận nối Dep1 với PosNull đâu :v
     -- Vì làm j có PosNull mà nối :))
