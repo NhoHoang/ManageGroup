@@ -351,13 +351,6 @@ CALL get_acc_of_group();
 
 
 
-
-
-
-
-
-
-
 ## QUESTION 3:
 
 DROP PROCEDURE IF EXISTS QUESTION_QTY_FROM_TYPE_QUESTION_InThiMonth;
@@ -464,11 +457,7 @@ WHERE G.GROUPNAME LIKE concat('%',INPUT,'%');
 END$$
 DELIMITER ;
 
-CALL STRING_TO_GOUP_OR_USERNAME('nhom');
-
-
-
-
+CALL STRING_TO_GOUP_OR_USERNAME('nhom 1');
 
 
 
@@ -607,6 +596,9 @@ CALL QUESTION9();
 
 
 
+
+
+
 ## QUESTION 10:
 
 DROP PROCEDURE IF EXISTS QUESTION10;
@@ -650,8 +642,11 @@ SELECT CONCAT("Deleted ",V_DEM1," Row(s) in Exam ", "and ",V_DEM2 ," Row(s) in E
 
 END$$
 DELIMITER ;
-CALL QUESTION10();
 
+BEGIN WORK;
+
+CALL QUESTION10();
+ROLLBACK;
 
 ## JUST FOR REFERENCE:
 SELECT ExamID FROM `EXAM`
@@ -746,17 +741,107 @@ CALL QUESTION12();
 
 
 
+## HOAWJC CACH KHAC
+DROP TABLE IF EXISTS TEMPORARY_TABLE2;
+CREATE TABLE TEMPORARY_TABLE2 (
+								`MONTH_TEMPO` TINYINT PRIMARY KEY AUTO_INCREMENT,
+								`CREATEDATE`DATETIME );
+INSERT INTO   TEMPORARY_TABLE2 
+							 (CREATEDATE)
+VALUE                        ('2021-01-01'),     
+							 ('2021-02-01'),
+							 ('2021-03-01'),
+							 ('2021-04-01'),
+							 ('2021-05-01'),
+							 ('2021-06-01'),
+							 ('2021-07-01'),
+							 ('2021-08-01'),
+							 ('2021-09-01'),
+							 ('2021-10-01'),
+							 ('2021-11-01'),
+							 ('2021-12-01');
+DROP VIEW IF EXISTS TEMPO_TABLE1;
+CREATE VIEW TEMPO_TABLE1 AS
+SELECT MONTH(CreateDate) AS `MONTH_Q` , COUNT(CreateDate) AS SL_CAUHOI
+FROM `QUESTION` AS Q
+WHERE 
+YEAR(CreateDate) = YEAR(NOW())
+GROUP BY (MONTH(CreateDate));
+
+
+SELECT TT2.MONTH_TEMPO, TT1.SL_CAUHOI
+FROM TEMPO_TABLE1 AS TT1
+JOIN TEMPORARY_TABLE2 AS TT2
+ON TT2.MONTH_TEMPO = TT1.MONTH_Q
+
+UNION
+
+SELECT TT2.MONTH_TEMPO, 0
+FROM TEMPO_TABLE1 AS TT1
+RIGHT JOIN TEMPORARY_TABLE2 AS TT2
+ON TT2.MONTH_TEMPO = TT1.MONTH_Q
+WHERE TT1.SL_CAUHOI IS NULL;
+
+
+
+
+
+
+
+
+
+
+
+
+
 ##QUESTION 13:
 
 DROP PROCEDURE IF EXISTS QUESTION13;
 DELIMITER $$
 CREATE PROCEDURE QUESTION13 ()
 BEGIN
+DROP TABLE IF EXISTS TEMPORARY_TABLE;
+CREATE TABLE TEMPORARY_TABLE (
+								`MONTH` TINYINT PRIMARY KEY AUTO_INCREMENT,
+								`CREATEDATE`DATETIME );
+INSERT INTO   TEMPORARY_TABLE 
+							 (CREATEDATE)
+VALUE                        ('2021-01-01'),     
+							 ('2021-02-01'),
+							 ('2021-03-01'),
+							 ('2021-04-01'),
+							 ('2021-05-01'),
+							 ('2021-06-01'),
+							 ('2021-07-01'),
+							 ('2021-08-01'),
+							 ('2021-09-01'),
+							 ('2021-10-01'),
+							 ('2021-11-01'),
+							 ('2021-12-01');
+-- SELECT * FROM   TEMPORARY_TABLE        
 
+SELECT   TT.`MONTH`, COUNT(Q.CreateDate) AS SL_QUES
+FROM 
+QUESTION 		AS Q
+RIGHT JOIN  
+TEMPORARY_TABLE AS TT   
+ON MONTH(Q.CREATEDATE) = (TT.`MONTH`)
+AND (Q.CREATEDATE) >=  date_sub(now(),interval 6 month )
+GROUP BY MONTH(TT.`CreateDate`);              
+DROP TABLE IF EXISTS TEMPORARY_TABLE;
 
 END$$
 DELIMITER ;
-SELECT DATEDIFF( NOW(), '2021-12-01')) <=6
+
+CALL QUESTION13();
+
+
+
+
+
+
+
+SELECT DATEDIFF( '2021-12-01', NOW()) <=6;
 							
 
 
@@ -952,14 +1037,159 @@ WHERE
 
      END$$
      DELIMITER ;
-     
+     set @OUT_OF_TYPE = 0;
  CALL     QUESTION4(@OUT_OF_TYPE);
  
  SELECT @OUT_OF_TYPE;
  
  
  
- 
- * FROM typequestion 
- WHERE @OUT_OF_TYPE = TypeID;
+
+-- #####################################################################
+-- #####################################################################
+-- #####################################################################
+     
+     
+     DROP PROCEDURE IF EXISTS spGetDepartmentID;
+DELIMITER $$
+	CREATE PROCEDURE spGetDepartmentID (IN department_Name VARCHAR(50), OUT departmentIdOut INT, OUT deparmentNameOut VARCHAR(50))
+		BEGIN
+			## tap hop cac cau lenh cua procedure
+			SELECT DepartmentID , DepartmentName INTO departmentIdOut, deparmentNameOut 
+            FROM Department WHERE DepartmentName LIKE department_Name;
+        END $$
+DELIMITER ;
+
+CALL spGetDepartmentID('%Sale%', @idDp, @nameDp);
+set @idDp =0;
+select @idDp;
+
+SELECT * FROM Department WHERE DepartmentID = @idDp;
+
+SELECT fGetDepartmentID('%Sale%');
+
+SELECT * FROM Department WHERE DepartmentID = (SELECT fGetDepartmentID('%Sale%'));
+
+
+
+
+
+
+
+SET GLOBAL log_bin_trust_function_creators = 1;
+## Function
+DROP FUNCTION IF EXISTS fGetDepartmentID;
+DELIMITER $$
+	CREATE FUNCTION fGetDepartmentID (department_Name VARCHAR(50)) 
+    RETURNS INT
+		BEGIN
+			DECLARE idDepartmentSelected INT; 
+			## tap hop cac cau lenh cua function
+			SELECT DepartmentID INTO idDepartmentSelected
+            FROM Department WHERE DepartmentName LIKE department_Name;
+
+			RETURN idDepartmentSelected;
+        END $$
+DELIMITER ;
+
+select fGetDepartmentID('Phong Dev 1');
+
+DROP FUNCTION IF EXISTS fGetDepartmentID;
+DELIMITER $$
+	CREATE FUNCTION fGetDepartmentID (department_Name VARCHAR(50)) RETURNS INT
+		BEGIN
+			DECLARE idDepartmentSelected INT; 
+			## tap hop cac cau lenh cua function
+			SELECT DepartmentID INTO idDepartmentSelected
+            FROM Department WHERE DepartmentName LIKE department_Name;
+
+			RETURN idDepartmentSelected;
+            SELECT * FROM `ACCOUNT` 
+            WHERE ACCOUNTID = idDepartmentSelected;
+        END $$
+DELIMITER ;
+
+     
+     
+     
+     DELIMITER $$
+	CREATE TRIGGER trigger_delete_department
+	BEFORE DELETE ON Department
+    FOR EACH ROW
+    BEGIN
+		DELETE FROM `ACCOUNT` WHERE DepartmentID IN (OLD.DepartmentID);
+    END $$
+DELIMITER ;
+
+SELECT accountid, departmentid FROM `Account` WHERE DepartmentID = 1
+UNION
+SELECT * FROM `Department` WHERE DepartmentID = 1;
+
+begin work;
+	DELETE from `Department` ;
+rollback;
+    
+    
+    
+ select * from `account`;   
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    WITH CTE_QUES8_1 AS
+(
+SELECT TypeID, CHARACTER_LENGTH(Content) AS DODAI
+FROM question
+where 
+TypeID = 1
+)
+SELECT * FROM CTE_QUES8_1;
+WITH CTE_QUES8_2 AS
+(
+SELECT TypeID, CHARACTER_LENGTH(Content) AS DODAI
+FROM question
+where 
+TypeID = 2
+)
+SELECT * FROM CTE_QUES8_2;
+   DROP PROCEDURE IF EXISTS QUES_LENGTH_MAX;
+   DELIMITER $$
+   CREATE PROCEDURE QUES_LENGTH_MAX ( IN_TYPENAME VARCHAR(50))
+   BEGIN
+		    DECLARE V_TYPENAME VARCHAR(50);
+			SELECT TypeID 
+            FROM `TYPEQUESTION`
+            WHERE V_TYPENAME = TypeName;
+        IF     
+   END$$
+   DELIMITER ;
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
      

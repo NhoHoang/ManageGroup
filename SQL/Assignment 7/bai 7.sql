@@ -1,9 +1,9 @@
 
-DROP DATABASE IF EXISTS `Testing_System_5`;
+DROP DATABASE IF EXISTS `Testing_System_test7`;
 /* Lenh tao Database */
-CREATE DATABASE IF NOT EXISTS `Testing_System_5`;
+CREATE DATABASE IF NOT EXISTS `Testing_System_test7`;
 /* Lenh su dung Database */
-USE `Testing_System_5`;
+USE `Testing_System_test7`;
 
 
 /*------------------- Create table ----------------------- */
@@ -57,6 +57,7 @@ CREATE TABLE IF NOT EXISTS `GroupAccount`
     `JoinDate`  DATETIME DEFAULT NOW()
 );
 
+SELECT * FROM GROUPACCOUNT;
 DROP TABLE IF EXISTS `TypeQuestion`;
 CREATE TABLE IF NOT EXISTS `TypeQuestion`
 (
@@ -115,8 +116,8 @@ CREATE TABLE IF NOT EXISTS `ExamQuestion`
 (
     `ExamID`     TINYINT UNSIGNED,
     `QuestionID` TINYINT UNSIGNED,
-    CONSTRAINT fk_eq1 FOREIGN KEY (ExamID) REFERENCES Exam (ExamID),
-    CONSTRAINT fk_eq2 FOREIGN KEY (QuestionID) REFERENCES Question (QuestionID)
+    CONSTRAINT fk_eq1 FOREIGN KEY (ExamID) REFERENCES Exam (ExamID) ON UPDATE CASCADE ON DELETE cascade,
+    CONSTRAINT fk_eq2 FOREIGN KEY (QuestionID) REFERENCES Question (QuestionID) ON UPDATE CASCADE ON DELETE cascade
 );
 
 
@@ -145,9 +146,7 @@ VALUES ('Dev1'),
        ('Scrum Master');
 
 /* lenh sua bang xoa khoa ngoai foreign key*/
-ALTER TABLE `Account`
-    DROP CONSTRAINT `fk_dp_id`,
-    DROP CONSTRAINT `fk_ps_id`;
+ALTER TABLE `Account` DROP CONSTRAINT `fk_dp_id`, DROP CONSTRAINT `fk_ps_id`;
     -- Anh có drop cnstraint ở đây r nhỉalter
     -- Chắc là nó không nhận nối Dep1 với PosNull đâu :v
     -- Vì làm j có PosNull mà nối :))
@@ -186,7 +185,7 @@ VALUES ('Nhom 1', '3', '2021-04-03'),
 /* INSERT DATA bang GroupAccount */
 INSERT INTO `GroupAccount`(`GroupID`, `AccountID`, `JoinDate`)
 VALUES ('1', '1', '2021-06-01'),
-       ('1', '3', '2020-01-01'),
+       ('2', '3', '2020-01-01'),
        ('1', '2', NOW()),
        ('1', '4', '2021-06-01'),
        ('2', '1', '2021-06-01'),
@@ -222,10 +221,13 @@ ALTER TABLE `Question`
     DROP CONSTRAINT `fk_q3`;
 /* INSERT DATA bang Question */
 INSERT INTO `Question`(`Content`, CategoryID, TypeID, CreatorID, CreateDate)
-VALUES ('Câu hỏi SQL 1', 2, 2, 1, '2021-04-01'),
+VALUES ('Câu hỏi SQL 1', 2, 2, 1, '2021-07-01'),
        ('Câu hỏi SQL 2', 2, 2, 2, '2020-01-01'),
-       ('Câu hỏi JAVA 1', 1, 1, 10, '2021-07-01'),
-       ('Câu hỏi JAVA 2', 1, 2, 5, '2021-06-01'),
+       ('Câu hỏi JAVA 1', 1, 1, 10, '2021-04-01'),
+       ('Câu hỏi JAVA1 2', 1, 2, 5, '2021-06-01'),
+       ('Câu hỏi JAVA2 2', 1, 2, 5, '2021-01-01'),
+       ('Câu hỏi JAVA3 2', 1, 2, 5, '2021-05-01'),
+       ('Câu hỏi JAVA4 2', 1, 2, 5, '2021-06-01'),
        ('Câu hỏi HTML 1', 3, 1, 2, NOW()),
        ('Câu hỏi HTML 2', 3, 2, 2, NOW());
 
@@ -259,9 +261,9 @@ ALTER TABLE `Exam`
 /* INSERT DATA bang Exam */
 INSERT INTO `Exam`(`Code`, `Title`, `CategoryID`, `Duration`, `CreatorID`, `CreateDate`)
 VALUES ('MS_01', 'De thi 01', 1, 90, 1, NOW()),
-       ('MS_02', 'De thi 02', 1, 60, 5, NOW()),
+       ('MS_02', 'De thi 02', 1, 60, 5, '2015-08-14 16:11:48'),
        ('MS_03', 'De thi 03', 2, 60, 9, NOW()),
-       ('MS_04', 'De thi 04', 2, 90, 1, NOW()),
+       ('MS_04', 'De thi 04', 2, 90, 1, '2015-08-14 16:11:48'),
        ('MS_05', 'De thi 05', 1, 60, 2, NOW()),
        ('MS_06', 'De thi 06', 2, 90, 2, NOW()),
        ('MS_07', 'De thi 07', 1, 60, 1, NOW());
@@ -281,365 +283,260 @@ VALUES (1, 1),
        (6, 2),
        (7, 2),
        (8, 2),
-       (9, 3),
-       (10, 3),
+       (2, 3),
+       (2, 3),
        (11, 4),
        (12, 4),
        (13, 4),
-       (14, 4),
-       (15, 5),
-       (16, 5);
-     ##
-     
-     
-     
-     
-     
-     -- ASSIGNMENT 3
-     #
-     # #
-     #  # #
-     #    # #
-     #  # #
-     #
-   -- QUESTION 3  
-SELECT  D.DepartmentID, A.Fullname, D.DepartmentName, A.Email 
+       (14, 4);
+       
+ ###############################################
+
+
+
+## question 1
+Drop TRIGGER IF EXISTS QUESTION1;
+delimiter $$
+create trigger QUESTION1
+before insert on `group`
+for each row
+begin
+if new.createdate <= date_sub(now(),interval 1 year)
+then
+signal sqlstate '12345'
+set message_text ='nhap sai createdate';
+end if;
+end$$
+delimiter ;
+
+INSERT INTO `Group`(`GroupName`, `CreatorID`, CreateDate)
+VALUES ('Nhom 99', '3', '2025-04-03'),
+       ('Nhom 100', '3', '2010-01-03');
+
+SELECT A.DepartmentID , D.DepartmentName 
 FROM `ACCOUNT` AS A
 RIGHT JOIN DEPARTMENT AS D
-ON   A.DEPARTMENTID = D.DEPARTMENTID
-WHERE D.DepartmentName LIKE '%SALE%'
-ORDER BY D.DEPARTMENTID;
-
-     -- QUESTION 4  
-     
-SELECT A.AccountID, A.Fullname, D.DepartmentName, character_length(A.Fullname) AS do_dai
-FROM `ACCOUNT` AS A
-JOIN DEPARTMENT AS D
-ON   A.DEPARTMENTID = D.DEPARTMENTID
-WHERE character_length(A.Fullname) =  ( SELECT MAX(`T`.`L`) FROM (  SELECT A.AccountID, A.Fullname, D.DepartmentName, character_length(A.Fullname) AS `L`
-												FROM `ACCOUNT` AS A
-												JOIN DEPARTMENT AS D
-												ON   A.DEPARTMENTID = D.DEPARTMENTID) AS T  );
-
- -- QUESTION 5
-SELECT A.AccountID, A.Fullname, D.DepartmentID ,D.DepartmentName, character_length(A.Fullname) AS BUOI
-FROM `ACCOUNT` AS A
-JOIN DEPARTMENT AS D
-ON   A.DEPARTMENTID = D.DEPARTMENTID
-WHERE character_length(A.Fullname) =  ( SELECT MAX(`T`.`L`) FROM (  SELECT A.AccountID, A.Fullname, D.DepartmentName, character_length(A.Fullname) AS `L`
-												FROM `ACCOUNT` AS A
-												JOIN DEPARTMENT AS D
-												ON   A.DEPARTMENTID = D.DEPARTMENTID) AS T  )
-AND D.DepartmenTID ='3';									
-                                                
-                                                
-                                                
- -- QUESTION 7
-SELECT Q.QuestionID, Q.Content, COUNT(A.QuestionID) AS SL
-FROM `ANSWER` AS A
-JOIN `QUESTION` AS Q
-ON A.QUESTIONID = Q.QUESTIONID
-GROUP BY A.QuestionID
-HAVING COUNT(A.QuestionID) >'3';
-
-
-
- -- QUESTION 8
- SELECT * FROM testing_system_5.exam
-
-WHERE Duration >= '60'
-AND CreateDate < '2021-08-09';
-
- -- QUESTION 9
- 
- SELECT * FROM testing_system_5.group
-
-order by CreateDate desc limit 2;
-
- -- QUESTION 10
- # SỐ NHÂN VIÊN THEO TỪNG PHÒNG
- SELECT D.DepartmentID , D.DepartmentName, A.Fullname, COUNT(A.DepartmentID)
- FROM DEPARTMENT AS D
- LEFT JOIN `ACCOUNT`  AS A
- ON
- D.DEPARTMENTID = A.DEPARTMENTID
- group by D.DEPARTMENTID;
- 
-# SỐ NHÂN VIÊN CỦA PHÒNG CÓ ID=2
-
-SELECT D.DepartmentID , D.DepartmentName, A.Fullname, COUNT(A.DepartmentID) AS SL
- FROM DEPARTMENT AS D
- JOIN `ACCOUNT`  AS A
- ON
- D.DEPARTMENTID = A.DEPARTMENTID
- WHERE A.DepartmentID ='2';
-
-
-
- -- QUESTION 11
-	#
-     delete from `exam`
-where examid='1';
-	
-
-alter TABLE `EXAM`
-CHANGE CREATORID CREATOO INT;
-
-UPDATE `EXAM`
-SET CREATOO = '3'
-WHERE EXAMID = '2';
-    
-   -- QUESTION 14
-   
-   UPDATE `ACCOUNT`
-SET FULLNAME = 'SUATEN',
-	EMAIL = 'AAAAAAAAAAAAA'
-	WHERE ACCOUNTID ='5';
-    
-    
-    ### ASSIGMENT 4
-    
-    
-    
--- QUESTION 1
-
-
-SELECT *
-FROM `ACCOUNT` AS A
-JOIN DEPARTMENT AS D
-ON  D.DEPARTMENTID = A.DEPARTMENTID;
-
-
-    
--- QUESTION 2
-SELECT A.AccountID, A.Email, A.Fullname, A.DepartmentID, D.DepartmentName, A.CreateDate
-FROM `ACCOUNT` AS A
-JOIN DEPARTMENT AS D
-ON  D.DEPARTMENTID = A.DEPARTMENTID
-WHERE A.CreateDate > '2020-07-01'
-GROUP BY ACCOUNTID;
-
--- QUESTION 3
-
-SELECT   A.Fullname, A.Email, A.DepartmentID, P.PositionName
-FROM `ACCOUNT` AS A
-JOIN POSITION AS P
-ON  P.POSITIONID = A.POSITIONID
-WHERE P.PositionName LIKE '%dev%';
-
--- QUESTION 4
-SELECT  D.DepartmentID, D.DepartmentName, COUNT(A.DepartmentID) AS SL_NV
-FROM `ACCOUNT` AS A
-JOIN DEPARTMENT AS D
-ON  D.DEPARTMENTID = A.DEPARTMENTID
-GROUP BY A.DepartmentID
-HAVING sl_nv = ( SELECT MAX(T.SL_NV) FROM (SELECT  D.DepartmentID, D.DepartmentName, COUNT(A.DepartmentID) AS SL_NV
-													FROM `ACCOUNT` AS A
-													JOIN DEPARTMENT AS D
-													ON  D.DEPARTMENTID = A.DEPARTMENTID
-													GROUP BY A.DepartmentID) AS T         
-                                                    
-								);
-
-
--- QUESTION 5
-SELECT Q.QuestionID ,Q.Content, COUNT(EQ.QuestionID) AS SL
-FROM EXAMQUESTION AS EQ
-JOIN QUESTION 	  AS Q
-ON   EQ.QuestionID = Q.QuestionID
-GROUP BY EQ.QuestionID
-HAVING 
-COUNT(EQ.QuestionID)  = (SELECT    MAX(T.SL)  FROM( SELECT Q.QuestionID ,Q.Content, COUNT(EQ.QuestionID) AS SL
-													FROM EXAMQUESTION AS EQ
-													JOIN QUESTION 	  AS Q
-													ON   EQ.QuestionID = Q.QuestionID
-													GROUP BY EQ.QuestionID) AS T  );
-
-
--- QUESTION 7
-SELECT Q.QuestionID, Q.Content, COUNT(EQ.QuestionID) AS SL
-FROM EXAMQUESTION AS EQ
-RIGHT JOIN QUESTION 	  AS Q
-ON   EQ.QuestionID = Q.QuestionID
-GROUP BY EQ.QuestionID;
-
--- QUESTION 9
-
-SELECT  G.GroupID, G.GroupName, COUNT(GA.GROUPID) AS SL
-FROM `GROUPACCOUNT` AS GA
-JOIN `ACCOUNT`  AS A
-ON GA.AccountID = A.AccountID
-JOIN `GROUP` AS G
-ON GA.GroupID = G.GroupID
-GROUP BY GA.GROUPID ;
-
--- QUESTION 10
-
-SELECT P.PositionID, P.PositionName, COUNT(A.PositionID) AS S_LUONG
-FROM 		`POSITION` AS P
-LEFT JOIN   `ACCOUNT`  AS A
-ON 			A.positionID = P.positionID
-GROUP BY (A.PositionID)
-HAVING   S_LUONG = (       
-						SELECT MAX(T.SL)   FROM(SELECT P.PositionID, P.PositionName, COUNT(A.PositionID) AS SL
-												FROM 		`POSITION` AS P
-												LEFT JOIN   `ACCOUNT`  AS A
-												ON 			A.positionID = P.positionID
-												GROUP BY (A.PositionID))  AS T         
-
-			  );
-
-
--- QUESTION 11
-
-SELECT D.DepartmentID, D.DepartmentName AS TENPHONG , A.PositionID, P.positionNAME AS VITRI, COUNT(A.positionID) AS SL_NGUOI
-FROM `DEPARTMENT` 	AS D
-LEFT JOIN `ACCOUNT` AS A
-ON 		  			   D.departmentID = A.departmentID
-LEFT JOIN `POSITION` AS P
-ON                     A.positionID   = P.positionID
-GROUP BY D.departmentID, A.positionID
-order by D.departmentID;
-
-
-
--- QUESTION 12
-SELECT Q.QuestionID, Q.Content,  A.Content, CQ.CategoryName, TQ.TypeName, Q.CreatorID, AC.Username,AC.Fullname
-FROM 
-	 `question` 			AS Q
-JOIN `ANSWER`   			AS A
-ON 			     		Q.QuestionID = A.QuestionID
-
-JOIN `categoryquestion` 	AS CQ
-ON						Q.CategoryID = CQ.CategoryID
-
-JOIN `typequestion` 		AS TQ
-ON 						Q.TypeID = TQ.TypeID
-
-JOIN `account`			AS AC
-ON 						Q.CreatorID = AC.AccountID
-ORDER BY Q.QuestionID;
-
-
-
--- QUESTION 13
-
-SELECT TQ.TypeID, TQ.TypeName, COUNT(Q.TypeID)
-FROM question AS Q
-JOIN typequestion AS TQ
-ON Q.TypeID = TQ.TypeID
-GROUP BY Q.TypeID;
-
--- QUESTION 14
-
-SELECT G.GroupID, G.GroupName, GA.AccountID
-FROM `group` AS G
-LEFT JOIN groupaccount AS GA
-ON G.GroupID = GA.GroupID
-WHERE GA.AccountID IS NULL;
-
-
-
--- QUESTION 15
-
-SELECT 
-    *
-FROM
-    testing_system_5.group AS G
-WHERE
-    G.GroupID NOT IN (SELECT 
-            GroupID
-        FROM
-            groupaccount);
-
-
--- QUESTION 16
-select *
-from question as q
-left join answer as a
-on q.QuestionID =a.QuestionID;
-
-SELECT q.QuestionID FROM answer a
-RIGHT JOIN question q on a.QuestionID = q.QuestionID
-WHERE a.QuestionID IS NULL;
-
-
-
--- QUESTION 17
-select GA.AccountID, G.GroupName
-FROM `GROUP` AS G
-JOIN groupaccount AS GA
-ON G.GroupID = GA.GroupID
-WHERE GA.GroupID = '1'
-
-
-
-UNION
-
-
-select GA.AccountID, G.GroupName
-FROM `GROUP` AS G
-JOIN groupaccount AS GA
-ON G.GroupID = GA.GroupID
-WHERE GA.GroupID = '5';
-
-
--- QUESTION 18
-
-SELECT GA.GroupID, COUNT(GA.GroupID) AS SLNV
-FROM groupaccount AS GA
-JOIN `account` AS A
-ON GA.AccountID = A.AccountID
-GROUP BY GA.GroupID
-HAVING SLNV > '3';
-
-
-SELECT  G.GroupID, G.GroupName, COUNT(GA.ACCOUNTID) AS SL
-FROM `GROUPACCOUNT` AS GA
-JOIN `ACCOUNT`  AS A
-ON GA.AccountID = A.AccountID
-JOIN `GROUP` AS G
-ON GA.GroupID = G.GroupID
-GROUP BY GA.GROUPID ;
-
-
-
-
-SELECT * FROM testing_system_5.account;
-
-DROP VIEW IF EXISTS  `V_ACCOUNT_SALE`;
-
-CREATE VIEW `V_ACCOUNT_SALE` AS
-SELECT A.*, DEPARTMENTNAME, POSITIONNAME
-FROM `ACCOUNT` AS A
-JOIN DEPARTMENT AS D
 USING (DEPARTMENTID)
-JOIN POSITION AS P
-USING (POSITIONID)
-WHERE DEPARTMENTNAME LIKE'%SALE%';
 
 
 
 
 
-# buoi 5
-WITH CTE_ACCOUNT AS 
-(
-SELECT A.*, DEPARTMENTNAME, POSITIONNAME
-FROM `ACCOUNT` AS A
-JOIN DEPARTMENT AS D
-ON  A.DEPARTMENTID=D.departmentID
-JOIN POSITION AS P
-ON A.POSITIONID=P.positionID
-) 
-SELECT * FROM CTE_ACCOUNT;
-SELECT departmentNAME FROM CTE_ACCOUNT;
 
 
-CÂU NÂNG CAO
-SELECT T.DEPARTMENTID, T.DEPARTMENTNAME, T.POSITIONID,T.POSITIONNAME, COUNT(A.ACCOUNTID) AS SL
-FROM (SELECT * FROM POSITION CROSS JOIN DEPARTMENT ORDER BY DEPARTMENTID) AS T
+## question 2
 
-LEFT JOIN `ACCOUNT` AS A ON T.DEPARTMENTID=A.DEPARTMENTID AND T.POSITIONID = A.POSITIONID
-GROUP BY T.DEPARTMENTID,T.POSITIONID;
+DROP TRIGGER IF EXISTS QUESTION2;
+DELIMITER $$
+CREATE TRIGGER QUESTION2
+BEFORE INSERT ON `ACCOUNT`
+FOR EACH ROW
+BEGIN
+DECLARE V_DEPT_ID TINYINT UNSIGNED;
+SELECT DEPARTMENTID INTO V_DEPT_ID 
+FROM DEPARTMENT 
+WHERE DEPARTMENTNAME like '%SALE%';
 
+IF NEW.DEPARTMENTID = V_DEPT_ID
+THEN 
+signal sqlstate '12345'
+set message_text = 'ko con slot cho sale';
+end if;
+
+END$$
+
+DELIMITER ;
+
+INSERT INTO `Account`(`Email`, `Username`, `Fullname`, `DepartmentID`, `PositionID`, `CreateDate`)
+
+VALUES ('vti_account1@vtaiacadsemy.com', 'vsati1', 'Naguyesn Van Tinh', 5, 1, '2019-12-01');
+
+
+
+
+
+
+
+
+
+
+## question 3
+
+DROP TRIGGER IF EXISTS QUESTION3;
+DELIMITER $$
+CREATE TRIGGER QUESTION3
+BEFORE INSERT ON `GroupAccount`
+FOR EACH ROW
+BEGIN
+
+DECLARE v_CountGroupID TINYINT;
+SELECT count(GA.GroupID) INTO v_CountGroupID 
+FROM groupaccount GA
+WHERE GA.GroupID = NEW.GroupID;
+
+IF (var_CountGroupID > 4) THEN
+SIGNAL SQLSTATE '12345'
+SET MESSAGE_TEXT = 'Cant add more User to This Group';
+END IF;
+
+END$$
+DELIMITER ;
+
+select * from groupaccount;
+
+-- Kiểm tra trigger
+INSERT INTO `GroupAccount`(`GroupID`, `AccountID`, `JoinDate`)
+VALUES ('5', '3', '2012-06-01');
+
+INSERT INTO `GroupAccount`(`GroupID`, `AccountID`, `JoinDate`)
+VALUES ('3', '2', '2002-06-01');
+
+INSERT INTO `GroupAccount`(`GroupID`, `AccountID`, `JoinDate`)
+VALUES ('3', '5', '2010-06-01');
+
+INSERT INTO `GroupAccount`(`GroupID`, `AccountID`, `JoinDate`)
+VALUES ('3', '4', '2010-06-01');
+
+ SELECT * FROM GROUPACCOUNT;
+ 
+       
+
+
+
+
+
+
+
+## question 4
+
+DROP TRIGGER IF EXISTS QUESTION4;
+DELIMITER $$
+CREATE TRIGGER QUESTION4
+BEFORE INSERT ON `EXAMQUESTION`
+FOR EACH ROW
+BEGIN
+DECLARE var_CountEXAMID TINYINT;
+SELECT count(*) INTO var_CountEXAMID 
+
+FROM examquestion 
+
+WHERE ExamID = NEW.ExamID;
+IF (var_CountEXAMID >=3) THEN
+SIGNAL SQLSTATE '12345'
+SET MESSAGE_TEXT = 'NHIEU HON 3 CAU HOI';
+END IF;
+END$$
+DELIMITER ;
+
+SELECT * FROM EXAMQUESTION;
+BEGIN WORK;
+
+INSERT INTO `ExamQuestion`
+VALUES (3, 1);
+    
+INSERT INTO `ExamQuestion`
+VALUES (2, 1);
+
+INSERT INTO `ExamQuestion`
+VALUES (66, 1);
+       
+ROLLBACK;
+
+
+## question 5
+
+drop TRIGGER IF EXISTS QUESTION5;
+DELIMITER $$
+CREATE TRIGGER QUESTION5
+BEFORE DELETE ON `ACCOUNT`
+FOR EACH ROW
+BEGIN
+IF OLD.EMAIL LIKE '%ADMIN@GMAIL.COM%'
+THEN
+SIGNAL SQLSTATE '12345'
+SET MESSAGE_TEXT = 'KO THE XOA ADMIN';
+END IF;
+END$$
+DELIMITER ;
+
+DELETE FROM `ACCOUNT`
+WHERE EMAIL LIKE '%ADMIN@GMAIL.COM%';
+
+
+
+## question 7
+SELECT * FROM `ANSWER`;
+
+DROP TRIGGER IF EXISTS QUESTION7;
+DELIMITER $$
+CREATE TRIGGER QUESTION7
+BEFORE INSERT ON `ANSWER`
+FOR EACH ROW
+BEGIN
+DECLARE V_COUNT_QUESTIONID TINYINT;
+DECLARE V_COUNT_ISCORRECTID TINYINT; 
+SELECT  COUNT(A.QuestionID)INTO V_COUNT_QUESTIONID
+FROM
+`ANSWER` AS A
+WHERE A.QuestionID  = NEW.QUESTIONID;
+
+SELECT COUNT(A.isCorrect)  INTO  V_COUNT_ISCORRECTID
+FROM
+`ANSWER` AS A
+WHERE A.isCorrect  = NEW.isCorrect
+AND A.QuestionID  = NEW.QUESTIONID;
+IF (V_COUNT_QUESTIONID >= 4) OR (V_COUNT_ISCORRECTID >= 2) THEN
+SIGNAL SQLSTATE '12345'
+SET MESSAGE_TEXT = 'KO THE TAO THEM ANSWER';
+END IF;
+
+END$$
+DELIMITER ;
+
+BEGIN WORK;
+INSERT INTO `Answer` (`Content`, `QuestionID`, `isCorrect`)
+VALUES ('Câu trả lời CHIU- question SQL 1', 6, 0);
+ROLLBACK;
+
+
+
+DROP TRIGGER IF EXISTS Trg_SetMaxAnswer;
+DELIMITER $$
+CREATE TRIGGER Trg_SetMaxAnswer
+BEFORE INSERT ON `answer`
+FOR EACH ROW
+BEGIN
+
+DECLARE v_CountAnsInQUes TINYINT;
+DECLARE v_CountAnsIsCorrects TINYINT;
+SELECT count(A.QuestionID) INTO v_CountAnsInQUes FROM answer A WHERE
+A.QuestionID = NEW.QuestionID;
+SELECT count(1) INTO v_CountAnsIsCorrects FROM answer A WHERE A.QuestionID =
+NEW.QuestionID AND A.isCorrect = NEW.isCorrect;
+IF (v_CountAnsInQUes > 4 ) OR (v_CountAnsIsCorrects >2) THEN
+
+SIGNAL SQLSTATE '12345'
+SET MESSAGE_TEXT = 'Cant insert more data pls check again!!';
+
+END IF;
+END $$
+DELIMITER ;
+
+DROP TRIGGER IF EXISTS Trg_GenderFromInput;
+DELIMITER $$
+CREATE TRIGGER Trg_GenderFromInput
+BEFORE INSERT ON `Account`
+FOR EACH ROW
+BEGIN
+IF NEW.Gender IS NULL THEN
+NEW.Gender  DEFAULT 'M'
+ELSEIF NEW.Gender = 'Nu' THEN
+SET NEW.Gender = 'F';
+ELSEIF NEW.Gender = 'Chưa xác định' THEN
+SET NEW.Gender = 'U';
+END IF ;
+
+END $$
+DELIMITER ;
+
+       
