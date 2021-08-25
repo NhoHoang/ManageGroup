@@ -1,6 +1,3 @@
-import java.time.LocalDate;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 
 public class Account {
 	int id;
@@ -9,7 +6,7 @@ public class Account {
 	String fullName;
 	Department deparment;
 	Position postion;
-	LocalDate createDate;
+	Date createDate;
 	Gender gender;
 	Group[] groups;
 	
@@ -23,6 +20,7 @@ public class Account {
 		this.gender = gender;
 	}
 
+	
 	public Account () {
 		super();
 	}
@@ -74,11 +72,11 @@ public class Account {
 		this.postion = postion;
 	}
 
-	public LocalDate getCreateDate() {
+	public Date getCreateDate() {
 		return createDate;
 	}
 
-	public void setCreateDate(LocalDate createDate) {
+	public void setCreateDate(Date createDate) {
 		this.createDate = createDate;
 	}
 
@@ -92,8 +90,7 @@ public class Account {
 
 	@Override
 	public String toString() {
-		return "Account có id=" + id + ", fullName=" + fullName + ", deparment=" + deparment + ", postion=" + postion
-				+ ", gender=" + gender + "";
+		return "Account [id=" + id + ", fullName=" + fullName + "]";
 	}
 
 	

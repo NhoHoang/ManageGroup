@@ -1,11 +1,13 @@
-import java.time.LocalDate;
 
 public class Group {
 	int id;
 	String name;
 	Account creator;
-	LocalDate createDate;
+	java.util.Date createDate;
 	Account[] accounts;
+	
+	
+	
 	public Group(int id, String name) {
 		super();
 		this.id = id;
@@ -13,9 +15,11 @@ public class Group {
 	}
 
 	
+	
 	public Group() {
 		super();
 	}
+	
 	public int getId() {
 		return id;
 	}
@@ -27,6 +31,7 @@ public class Group {
 	public String getName() {
 		return name;
 	}
+
 
 	public void setName(String name) {
 		this.name = name;
@@ -40,4 +45,5 @@ public class Group {
 		this.creator = creator;
 	}
 
+	
 }

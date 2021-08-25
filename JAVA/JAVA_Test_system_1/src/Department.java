@@ -2,6 +2,7 @@
 public class Department {
 	int id;
 	String name;
+	Date createDate;
 
 	public Department(int id, String name) {
 		super();
@@ -9,6 +10,7 @@ public class Department {
 		this.name = name;
 	}
 
+	
 	public Department() {
 		super();
 	}
@@ -29,9 +31,6 @@ public class Department {
 		this.name = name;
 	}
 
-	@Override
-	public String toString() {
-		return "Department [id=" + id + ", name=" + name + ", getId()=" + getId() + ", getName()=" + getName() + "]";
-	}
+	
 
 }

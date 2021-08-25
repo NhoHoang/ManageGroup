@@ -7,5 +7,5 @@ public class Exam {
 		CategoryQuestion 	categoryQuestion;
 		byte 				duration;
 		Account				creator;
-		LocalDate 			createDate;
+		Date 				createDate;
 }
